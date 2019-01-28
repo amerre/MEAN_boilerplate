@@ -6,7 +6,7 @@ const postRouter = express.Router();
 //
 
 /*
-Définition
+Definition
 */
 class PostRouterClass {
   constructor() {}

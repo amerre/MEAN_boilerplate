@@ -4,29 +4,32 @@ Imports
 // Nodejs
 const { Router } = require("express");
 
-//Inner
+// Inner
 const FrontRouterClass = require("./front/front.routes");
 const PostRouterClass = require("./post/post.routes");
+const UserRouterClass = require("./user/user.routes");
 //
 
 /*
-Définition des routers
+Definition des router
 */
 // Parent
 const mainRouter = Router();
 const apiRouter = Router();
 
 // Child
-const FrontRouter = new FrontRouterClass();
-const PostRouter = new PostRouterClass();
+const frontRouter = new FrontRouterClass();
+const postRouter = new PostRouterClass();
+const userRouter = new UserRouterClass();
 //
 
 /*
 Définition des routes
 */
 mainRouter.use("/api", apiRouter);
-apiRouter.use("/post", PostRouter.init());
-mainRouter.use("/", FrontRouter.init());
+apiRouter.use("/user", userRouter.init());
+apiRouter.use("/post", postRouter.init());
+mainRouter.use("/", frontRouter.init());
 //
 
 /*
