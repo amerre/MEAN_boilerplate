@@ -1,8 +1,12 @@
 /*
 Import & config
 */
+// NodeJS
 const express = require("express");
 const userRouter = express.Router();
+
+// Inner
+const UserModel = require("../../models/user.model");
 //
 
 /*
@@ -14,7 +18,15 @@ class UserRouterClass {
   routes() {
     // Create
     userRouter.post("/", (req, res) => {
-      res.json({ msg: "Create user", req: req.body });
+      // Vérifier la présence de données dans le body
+      if (typeof req.body != undefined || req.body !== null) {
+        // Inscrire un user
+        UserModel.create(req.body)
+          .then(user => res.json({ msg: "User created", req: user }))
+          .catch(err => res.json({ msg: "User not created", data: err }));
+      } else {
+        res.json({ msg: "No data provided", data: null });
+      }
     });
 
     // Read
