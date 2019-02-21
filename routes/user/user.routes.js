@@ -1,59 +1,68 @@
-/*
+/* 
 Import & config
 */
-// NodeJS
-const express = require("express");
-const userRouter = express.Router();
+    // NodeJS
+    const express = require('express');
+    const userRouter = express.Router();
 
-// Inner
-const UserModel = require("../../models/user.model");
+    // Inner
+    const checkFields = require('../../services/request.checker');
+    const { createItem, readItem, updateItem, deleteItem } = require('./user.ctrl');
 //
 
-/*
+/* 
 Definition
 */
-class UserRouterClass {
-  constructor() {}
+    class UserRouterClass {
+        constructor(){}
 
-  routes() {
-    // Create
-    userRouter.post("/", (req, res) => {
-      // Vérifier la présence de données dans le body
-      if (typeof req.body != undefined || req.body !== null) {
-        // Inscrire un user
-        UserModel.create(req.body)
-          .then(user => res.json({ msg: "User created", req: user }))
-          .catch(err => res.json({ msg: "User not created", data: err }));
-      } else {
-        res.json({ msg: "No data provided", data: null });
-      }
-    });
+        routes(){
+            // Create
+            userRouter.post( '/', (req, res) => {
 
-    // Read
-    userRouter.get("/", (req, res) => {
-      res.json({ msg: "Read user" });
-    });
+                // Error: no body present
+                if (typeof req.body === 'undefined' || req.body === null) { 
+                    return res.json( { msg: 'No body data provided', data: null } )
+                }
+                
+                // Check fields in the body
+                const { ok, extra, miss } = checkFields( [ 'name', 'email', 'password' ], req.body )
 
-    // Update
-    userRouter.put("/", (req, res) => {
-      res.json({ msg: "Update user" });
-    });
+                //=> Error: bad fields provided
+                if( !ok ) res.json( { msg: 'Bad fields provided', data: { miss: miss, extra: extra } } )
+                else{
+                    // Register new user
+                    createItem(req.body)
+                    .then( apiResponse => res.json( { msg: 'User created', data: apiResponse } ) )
+                    .catch(apiResponse => res.json( { msg: 'User not created', data: apiResponse } ) );
+                }
+            })
 
-    // Delete
-    userRouter.delete("/", (req, res) => {
-      res.json({ msg: "Delete user" });
-    });
-  }
+            // Read
+            userRouter.get( '/', (req, res) => {
+                res.json( { msg: "Read user" } )
+            })
 
-  init() {
-    this.routes();
-    return userRouter;
-  }
-}
+            // Update
+            userRouter.put( '/', (req, res) => {
+                res.json( { msg: "Update user" } )
+            })
+
+            // Delete
+            userRouter.delete( '/', (req, res) => {
+                res.json( { msg: "Delete user" } )
+            })
+        }
+
+        init(){
+            this.routes();
+            return userRouter;
+        }
+    }
 //
 
-/*
+/* 
 Export
 */
-module.exports = UserRouterClass;
+    module.exports = UserRouterClass;
 //
